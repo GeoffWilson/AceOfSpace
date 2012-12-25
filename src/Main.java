@@ -8,6 +8,9 @@ public class Main
 
     public Main()
     {
+        GamePad gamePad = new GamePad();
 
+        Thread thread = new Thread(new Render(gamePad), "Core Rendering");
+        thread.start();
     }
 }
