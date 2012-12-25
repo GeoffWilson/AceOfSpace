@@ -39,7 +39,7 @@ public class Render implements Runnable
     {
         this.gamePad = gamePad;
         this.setupGame();
-        this.shots = new ConcurrentLinkedQueue<>();
+        this.shots = new ConcurrentLinkedQueue<Shot>();
 
         Dimension dimension = new Dimension(640, 480);
         Frame baseFrame = new Frame();
