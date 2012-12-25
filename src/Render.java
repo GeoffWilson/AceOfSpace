@@ -14,13 +14,6 @@ public class Render implements Runnable
     private Player player;
     private ConcurrentLinkedQueue<Shot> shots;
 
-    private class Player
-    {
-        public int x;
-        public int y;
-        public boolean shoot;
-    }
-
     private class Shot
     {
         public int x;
@@ -90,9 +83,7 @@ public class Render implements Runnable
                 graphics.fillOval(s.x, s.y, 5,5);
             }
 
-            graphics.setColor(new Color(0x400040));
-            graphics.fillRoundRect(player.x, player.y, 32, 32, 25, 25);
-
+            graphics.drawImage(player.getFrame(), player.x, player.y, null);
             buffer.show();
 
             LockSupport.parkNanos(16666666L);
