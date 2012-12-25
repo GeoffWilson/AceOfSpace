@@ -27,7 +27,7 @@ public class Player
         south.loadAnimation("assets/char_model/model_down_", 3);
 
         animations.put("south", south);
-        south.beginAnimation(2500);
+        south.beginAnimation(150);
     }
 
     public BufferedImage getFrame()

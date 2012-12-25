@@ -1,4 +1,6 @@
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.LockSupport;
@@ -37,6 +39,15 @@ public class Render implements Runnable
         Dimension dimension = new Dimension(640, 480);
         Frame baseFrame = new Frame();
         baseFrame.setPreferredSize(dimension);
+        baseFrame.addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                super.windowClosing(e);    //To change body of overridden methods use File | Settings | File Templates.
+                System.exit(0);
+            }
+        });
         baseFrame.setIgnoreRepaint(true);
         baseFrame.setResizable(false);
         baseFrame.setBounds(0, 0, 640, 480);
@@ -94,8 +105,8 @@ public class Render implements Runnable
     {
         int x = gamePad.getXAxis();
         int y = gamePad.getYAxis();
-        player.x += x;
-        player.y += y;
+        player.x += x * player.moveX;
+        player.y += y * player.moveY;
         boolean shoot = gamePad.getButton(0);
 
         if (shoot && !player.shoot)
