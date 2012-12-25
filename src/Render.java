@@ -105,9 +105,20 @@ public class Render implements Runnable
     {
         int x = gamePad.getXAxis();
         int y = gamePad.getYAxis();
+        boolean shoot = gamePad.getButton(0);
+
+        // Work out player details
         player.x += x * player.moveX;
         player.y += y * player.moveY;
-        boolean shoot = gamePad.getButton(0);
+
+        if (x == 0 && y == 1) player.updateDirection(Directions.SOUTH);
+        else if (x == 1 && y == 1) player.updateDirection(Directions.NORTH_EAST);
+        else if (x == 1 && y == 0) player.updateDirection(Directions.EAST);
+        else if (x == 1 && y == -1) player.updateDirection(Directions.SOUTH_EAST);
+        else if (x == 0 && y == -1) player.updateDirection(Directions.NORTH);
+        else if (x == -1 && y == -1) player.updateDirection(Directions.SOUTH_WEST);
+        else if (x == -1 && y == 0) player.updateDirection(Directions.WEST);
+        else if (x == -1 && y == 1) player.updateDirection(Directions.NORTH_WEST);
 
         if (shoot && !player.shoot)
         {

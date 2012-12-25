@@ -17,6 +17,10 @@ public class Player
 
     public boolean shoot;
 
+    private String currentAnimation;
+    private int animationDelay = 150;
+    public Directions direction;
+
     public Player()
     {
         animations = new ConcurrentHashMap<String, Animation>();
@@ -25,13 +29,34 @@ public class Player
 
         Animation south = new Animation(frameOrder);
         south.loadAnimation("assets/char_model/model_down_", 3);
-
         animations.put("south", south);
-        south.beginAnimation(150);
+
+        Animation north = new Animation(frameOrder);
+        north.loadAnimation("assets/char_model/model_up_", 3);
+        animations.put("north", north);
+
+        currentAnimation = Directions.SOUTH.name().toLowerCase();
+        animations.get(currentAnimation).beginAnimation(150);
+    }
+
+    public void changeAnimation(String name)
+    {
+        animations.get(currentAnimation).stopAnimation();
+        currentAnimation = name;
+        animations.get(name).beginAnimation(animationDelay);
     }
 
     public BufferedImage getFrame()
     {
-        return animations.get("south").getFrame();
+        return animations.get(currentAnimation).getFrame();
+    }
+
+    public void updateDirection(Directions direction)
+    {
+        if (this.direction != direction)
+        {
+            this.direction = direction;
+            changeAnimation(direction.name().toLowerCase());
+        }
     }
 }

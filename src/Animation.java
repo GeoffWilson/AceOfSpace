@@ -12,6 +12,7 @@ public class Animation
     private ArrayList<BufferedImage> frames;
     private int[] frameOrder;
     private int currentFrame;
+    private Timer timer;
 
     public Animation(int[] frameOrder)
     {
@@ -21,8 +22,14 @@ public class Animation
 
     public void beginAnimation(int delay)
     {
-        Timer timer = new Timer();
+        currentFrame = 0;
+        timer = new Timer();
         timer.schedule(new Animate(), 0, delay);
+    }
+
+    public void stopAnimation()
+    {
+        timer.cancel();
     }
 
     public BufferedImage getFrame()
