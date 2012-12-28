@@ -3,26 +3,21 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Player
 {
-    private ConcurrentHashMap<String, Animation> animations;
-
     public int x = 100;
     public int y = 100;
-
     public int moveX = 2;
     public int moveY = 2;
-
     public int realX;
     public int realY;
-
     public boolean shoot;
-
-    private String currentAnimation;
-    private int animationDelay = 150;
     public Directions direction;
+    private ConcurrentHashMap<String, Animation> animations;
+    private String currentAnimation;
 
     public Player()
     {
         animations = new ConcurrentHashMap<String, Animation>();
+        direction = Directions.SOUTH;
 
         int frameOrder[] = {0, 1, 0, 2};
 
@@ -40,9 +35,11 @@ public class Player
 
     public void changeAnimation(String name)
     {
+        if (!animations.containsKey(name)) name = "south";
+
         animations.get(currentAnimation).stopAnimation();
         currentAnimation = name;
-        animations.get(name).beginAnimation(animationDelay);
+        animations.get(name).beginAnimation(150);
     }
 
     public BufferedImage getFrame()
