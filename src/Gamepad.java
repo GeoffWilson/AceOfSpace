@@ -26,7 +26,7 @@ public class GamePad
 
             GamePadPoll poll = new GamePadPoll();
             Timer timer = new Timer();
-            timer.schedule(poll, 0, 10);
+            timer.schedule(poll, 0, 16);
         }
     }
 

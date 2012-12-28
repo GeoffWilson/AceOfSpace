@@ -7,16 +7,20 @@ public class Player
     public int y = 100;
     public int moveX = 2;
     public int moveY = 2;
-    public int realX;
-    public int realY;
     public boolean shoot;
     public Directions direction;
-    private ConcurrentHashMap<String, Animation> animations;
-    private String currentAnimation;
+    protected ConcurrentHashMap<String, Animation> animations;
+    protected String currentAnimation;
+    protected ConcurrentHashMap<String, Audio> sounds;
 
     public Player()
     {
         animations = new ConcurrentHashMap<String, Animation>();
+        sounds = new ConcurrentHashMap<String, Audio>();
+
+        Audio shootSound = new Audio("shot.vgz");
+        sounds.put("shoot", shootSound);
+
         direction = Directions.SOUTH;
 
         int frameOrder[] = {0, 1, 0, 2};
@@ -54,5 +58,11 @@ public class Player
             this.direction = direction;
             changeAnimation(direction.name().toLowerCase());
         }
+    }
+
+    public void shoot()
+    {
+        this.shoot = true;
+        sounds.get("shoot").play(1,2);
     }
 }

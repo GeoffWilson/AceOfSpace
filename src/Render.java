@@ -1,7 +1,10 @@
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.LockSupport;
 
@@ -15,7 +18,9 @@ public class Render implements Runnable
     private GamePad gamePad;
     private Player player;
     private ConcurrentLinkedQueue<Shot> shots;
-    private Audio shot;
+    private Level currentLevel;
+    private boolean running = true;
+    private BufferedImage tmpEnemyImage;
 
     private class Shot
     {
@@ -36,12 +41,19 @@ public class Render implements Runnable
         this.gamePad = gamePad;
         this.setupGame();
         this.shots = new ConcurrentLinkedQueue<Shot>();
-        //Audio backgroundMusic = new Audio("music.vgz");
-        //backgroundMusic.play(1, 1000);
-        this.shot = new Audio("shot.vgz");
+        this.currentLevel = new Level();
+
+        try
+        {
+            tmpEnemyImage = ImageIO.read(getClass().getResourceAsStream("assets/baddie.png"));
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
 
         Dimension dimension = new Dimension(640, 480);
-        Frame baseFrame = new Frame();
+        Frame baseFrame = new Frame("Ace Of Space v0.1");
         baseFrame.setPreferredSize(dimension);
         baseFrame.addWindowListener(new WindowAdapter()
         {
@@ -49,7 +61,7 @@ public class Render implements Runnable
             public void windowClosing(WindowEvent e)
             {
                 super.windowClosing(e);    //To change body of overridden methods use File | Settings | File Templates.
-                System.exit(0);
+                running = false;
             }
         });
         baseFrame.setIgnoreRepaint(true);
@@ -70,6 +82,7 @@ public class Render implements Runnable
         graphics = (Graphics2D) buffer.getDrawGraphics();
 
         baseFrame.setVisible(true);
+        currentLevel.beginLevel();
     }
 
     private void setupGame()
@@ -81,28 +94,63 @@ public class Render implements Runnable
 
     public void run()
     {
-        while (true)
+        while (running)
         {
             this.updateInput();
-
-            graphics.setColor(Color.BLACK);
-            graphics.fillRect(0, 0, 640, 480);
-
-            for (Shot s : shots)
-            {
-                if (s.x > 640 || s.x < 0) shots.remove(s);
-                if (s.y > 480 || s.y < 0) shots.remove(s);
-
-                s.inc();
-                graphics.setColor(Color.YELLOW);
-                graphics.fillOval(s.x, s.y, 5,5);
-            }
-
-            graphics.drawImage(player.getFrame(), player.x, player.y, null);
-            buffer.show();
-
+            this.logic();
+            this.render();
             LockSupport.parkNanos(16666666L);
         }
+
+        System.exit(0);
+    }
+
+    private void logic()
+    {
+        for (Shot s : shots)
+        {
+            if (currentLevel.checkCollision(s.x, s.y))
+            {
+                System.out.println("Enemy hit");
+            }
+        }
+
+        int delta = 98;
+        int random = (int) (Math.random() * 100);
+
+        if (random > delta)
+        {
+            Enemy newEnemy = new Enemy();
+            newEnemy.x = 150;
+            newEnemy.y = 300;
+            currentLevel.addEnemy(newEnemy);
+        }
+
+        currentLevel.moveEnemies(player.x, player.y);
+    }
+
+    private void render()
+    {
+        graphics.setColor(Color.BLACK);
+        graphics.drawImage(currentLevel.getImage(), 0, 0, null);
+
+        for (Shot s : shots)
+        {
+            if (s.x > 640 || s.x < 0) shots.remove(s);
+            if (s.y > 480 || s.y < 0) shots.remove(s);
+
+            s.inc();
+            graphics.setColor(Color.YELLOW);
+            graphics.fillOval(s.x, s.y, 5,5);
+        }
+
+        for (Enemy e : currentLevel.getEnemies())
+        {
+            graphics.drawImage(tmpEnemyImage, e.x, e.y, null);
+        }
+
+        graphics.drawImage(player.getFrame(), player.x, player.y, null);
+        buffer.show();
     }
 
     private void updateInput()
@@ -124,12 +172,10 @@ public class Render implements Runnable
         else if (x == -1 && y == 0) player.updateDirection(Directions.WEST);
         else if (x == -1 && y == 1) player.updateDirection(Directions.SOUTH_WEST);
 
-        if (y != 0 || x != 0) System.out.println("x " + x + " y " + y);
-
         if (shoot && !player.shoot)
         {
             player.shoot = true;
-            this.shot.play(1, 2);
+            player.shoot();
 
             Shot newShot = new Shot();
             newShot.x = player.x + 14;
