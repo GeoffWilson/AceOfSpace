@@ -111,7 +111,7 @@ public class Render implements Runnable
         {
             if (currentLevel.checkCollision(s.x, s.y))
             {
-                System.out.println("Enemy hit");
+                shots.remove(s);
             }
         }
 

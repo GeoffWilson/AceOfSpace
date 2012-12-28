@@ -68,8 +68,8 @@ public class Level
         for (Enemy e : enemies)
         {
             Rectangle r = new Rectangle(shotX, shotY, 5, 5);
-            Point p = new Point(e.x, e.y);
-            if (r.contains(p))
+            Rectangle p = new Rectangle(e.x, e.y, 64 ,64);
+            if (p.contains(r))
             {
                 hitEnemy = e;
             }

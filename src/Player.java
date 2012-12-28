@@ -33,6 +33,14 @@ public class Player
         north.loadAnimation("assets/char_model/model_up_", 3);
         animations.put("north", north);
 
+        Animation east = new Animation(frameOrder);
+        east.loadAnimation("assets/char_model/model_right_", 3);
+        animations.put("east", east);
+
+        Animation west = new Animation(frameOrder);
+        west.loadAnimation("assets/char_model/model_left_", 3);
+        animations.put("west", west);
+
         currentAnimation = Directions.SOUTH.name().toLowerCase();
         animations.get(currentAnimation).beginAnimation(150);
     }
