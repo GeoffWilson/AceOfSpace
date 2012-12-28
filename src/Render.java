@@ -15,6 +15,8 @@ public class Render implements Runnable
     private GamePad gamePad;
     private Player player;
     private ConcurrentLinkedQueue<Shot> shots;
+    private Audio audio;
+    private Audio shot;
 
     private class Shot
     {
@@ -35,6 +37,9 @@ public class Render implements Runnable
         this.gamePad = gamePad;
         this.setupGame();
         this.shots = new ConcurrentLinkedQueue<Shot>();
+        this.audio = new Audio("music.vgz");
+        this.audio.play(1, 1000);
+        this.shot = new Audio("shot.vgz");
 
         Dimension dimension = new Dimension(640, 480);
         Frame baseFrame = new Frame();
@@ -123,6 +128,8 @@ public class Render implements Runnable
         if (shoot && !player.shoot)
         {
             player.shoot = true;
+            this.shot.play(1, 2);
+
             Shot newShot = new Shot();
             newShot.x = player.x + 14;
             newShot.y = player.y + 14;
