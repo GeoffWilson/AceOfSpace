@@ -34,7 +34,6 @@ public class Animation
 
     public BufferedImage getFrame()
     {
-        System.out.println(frameOrder[currentFrame]);
         return frames.get(frameOrder[currentFrame]);
     }
 
