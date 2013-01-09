@@ -1,14 +1,16 @@
+import uk.co.kernite.VGM.VGMPlayer;
+
 public class Audio
 {
-    //private VGMPlayer playback;
+    private VGMPlayer playback;
 
     public Audio(String fileName)
     {
         try
         {
-            //playback = new VGMPlayer(22050);
-            //playback.setVolume(1.0D);
-            //playback.loadFile("src/audio/" + fileName);
+            playback = new VGMPlayer(22050);
+            playback.setVolume(1.0D);
+            playback.loadFile("src/audio/" + fileName);
         }
         catch (Exception e)
         {
@@ -37,7 +39,7 @@ public class Audio
         {
             try
             {
-               // playback.startTrack(track, duration);
+               playback.startTrack(track, duration);
             }
             catch (Exception e)
             {
