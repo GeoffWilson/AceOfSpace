@@ -1,3 +1,5 @@
+import ui.MessageWindow;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -21,6 +23,8 @@ public class Render implements Runnable
     private Level currentLevel;
     private boolean running = true;
     private BufferedImage tmpEnemyImage;
+
+    private boolean UIGameLock = false;
 
     private class Shot
     {
@@ -119,7 +123,9 @@ public class Render implements Runnable
         while (running)
         {
             this.updateInput();
-            this.logic();
+
+            if (!UIGameLock) this.logic();
+
             this.render();
             LockSupport.parkNanos(16666666L);
         }
@@ -156,7 +162,6 @@ public class Render implements Runnable
         graphics = (Graphics2D)buffer.getDrawGraphics();
 
         graphics.setColor(Color.BLACK);
-        graphics.fillRect(0, 0, 640, 480);
         graphics.drawImage(currentLevel.getImage(), 0, 0, null);
 
         for (Shot s : shots)
@@ -176,6 +181,13 @@ public class Render implements Runnable
 
         graphics.drawImage(player.getFrame(), player.x, player.y, null);
 
+        if (UIGameLock)
+        {
+            MessageWindow msgWindow = new MessageWindow(graphics);
+            msgWindow.setText("Hello World");
+            msgWindow.render();
+        }
+
         buffer.show();
     }
 
@@ -184,6 +196,8 @@ public class Render implements Runnable
         int x = gamePad.getXAxis();
         int y = gamePad.getYAxis();
         boolean shoot = gamePad.getButton(0);
+
+        UIGameLock = gamePad.getButton(1);
 
         // Work out player details
         player.x += x * player.moveX;
