@@ -82,6 +82,28 @@ public class Render implements Runnable
         graphics = (Graphics2D) buffer.getDrawGraphics();
 
         baseFrame.setVisible(true);
+
+        GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice graphicsDevice = graphicsEnvironment.getDefaultScreenDevice();
+
+        if (false)
+        {
+            baseFrame.setUndecorated(true);
+            if (graphicsDevice.isFullScreenSupported())
+            {
+                graphicsDevice.setFullScreenWindow(baseFrame);
+            }
+            else
+            {
+                System.out.println("Full screen is not supported on your system :(");
+            }
+        }
+        if (graphicsDevice.isDisplayChangeSupported())
+        {
+            int colorDepth = 32;
+            graphicsDevice.setDisplayMode(new DisplayMode(640, 480, colorDepth, DisplayMode.REFRESH_RATE_UNKNOWN));
+        }
+
         currentLevel.beginLevel();
     }
 
@@ -131,7 +153,10 @@ public class Render implements Runnable
 
     private void render()
     {
+        graphics = (Graphics2D)buffer.getDrawGraphics();
+
         graphics.setColor(Color.BLACK);
+        graphics.fillRect(0, 0, 640, 480);
         graphics.drawImage(currentLevel.getImage(), 0, 0, null);
 
         for (Shot s : shots)
@@ -150,6 +175,7 @@ public class Render implements Runnable
         }
 
         graphics.drawImage(player.getFrame(), player.x, player.y, null);
+
         buffer.show();
     }
 

@@ -47,7 +47,8 @@ public class Player
 
     public void changeAnimation(String name)
     {
-        if (!animations.containsKey(name)) name = "south";
+        if (name.contains("north")) name = "north";
+        else if (!animations.containsKey(name)) name = "south";
 
         animations.get(currentAnimation).stopAnimation();
         currentAnimation = name;
