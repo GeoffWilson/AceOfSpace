@@ -44,6 +44,11 @@ public class Level
         enemies.offer(enemy);
     }
 
+    public int getEnemyCount()
+    {
+        return enemies.size();
+    }
+
     public void moveEnemies(int playerX, int playerY)
     {
         for (Enemy e : enemies)

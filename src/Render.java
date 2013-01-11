@@ -143,7 +143,7 @@ public class Render implements Runnable
             }
         }
 
-        int delta = 98;
+        int delta = 95;
         int random = (int) (Math.random() * 100);
 
         if (random > delta)
@@ -187,6 +187,9 @@ public class Render implements Runnable
             msgWindow.setText("Hello World");
             msgWindow.render();
         }
+
+        graphics.setColor(Color.WHITE);
+        graphics.drawString(Integer.toString(currentLevel.getEnemyCount()), 10, 20);
 
         buffer.show();
     }
