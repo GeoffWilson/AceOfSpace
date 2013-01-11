@@ -63,7 +63,7 @@ public class JoyPad
         {
             System.out.println(c.getName());
 
-            if (c.getType() == net.java.games.input.Controller.Type.GAMEPAD)
+            if (c.getType() == net.java.games.input.Controller.Type.GAMEPAD || c.getType() == Controller.Type.STICK)
             {
                 System.out.println(c.getName());
                 controller = c;
