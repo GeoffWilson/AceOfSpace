@@ -5,14 +5,14 @@ import net.java.games.input.ControllerEnvironment;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class GamePad
+public class JoyPad
 {
-    private Controller controller;
+    private net.java.games.input.Controller controller;
     private Component[] buttons;
     private Component xAxis;
     private Component yAxis;
 
-    public GamePad()
+    public JoyPad()
     {
         if (this.getController())
         {
@@ -59,9 +59,11 @@ public class GamePad
 
         boolean controllerFound = false;
 
-        for (Controller c : controllerEnvironment.getControllers())
+        for (net.java.games.input.Controller c : controllerEnvironment.getControllers())
         {
-            if (c.getType() == Controller.Type.GAMEPAD)
+            System.out.println(c.getName());
+
+            if (c.getType() == net.java.games.input.Controller.Type.GAMEPAD)
             {
                 System.out.println(c.getName());
                 controller = c;

@@ -17,7 +17,7 @@ public class Render implements Runnable
 {
     private Graphics2D graphics;
     private BufferStrategy buffer;
-    private GamePad gamePad;
+    private JoyPad gamePad;
     private Player player;
     private ConcurrentLinkedQueue<Shot> shots;
     private Level currentLevel;
@@ -40,7 +40,7 @@ public class Render implements Runnable
         }
     }
 
-    public Render(GamePad gamePad)
+    public Render(JoyPad gamePad)
     {
         this.gamePad = gamePad;
         this.setupGame();
