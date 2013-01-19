@@ -9,8 +9,7 @@ import static java.lang.ClassLoader.getSystemClassLoader;
 public class Level
 {
     private ConcurrentLinkedQueue<Enemy> enemies;
-    private ConcurrentLinkedQueue<Spawner> spanwers;
-    private ConcurrentLinkedQueue<Polygon> collisionPoints;
+    private ConcurrentLinkedQueue<Spawner> spawners;
     private BufferedImage texture;
     private Audio backgroundMusic;
 
@@ -19,8 +18,20 @@ public class Level
         try
         {
             enemies = new ConcurrentLinkedQueue<Enemy>();
-            spanwers = new ConcurrentLinkedQueue<Spawner>();
-            collisionPoints = new ConcurrentLinkedQueue<Polygon>();
+            spawners = new ConcurrentLinkedQueue<Spawner>();
+
+            // Create three test spawners
+            Spawner spawnerOne = new Spawner(this, 0, 1000);
+            spawnerOne.setLocation(100, 20);
+            Spawner spawnerTwo = new Spawner(this, 0, 500);
+            spawnerTwo.setLocation(300, 200);
+            Spawner spawnerThree = new Spawner(this, 0, 2500);
+            spawnerThree.setLocation(10, 400);
+
+            spawners.add(spawnerOne);
+            spawners.add(spawnerTwo);
+            spawners.add(spawnerThree);
+
             texture = ImageIO.read(getSystemClassLoader().getResourceAsStream("levels/test.jpg"));
             backgroundMusic = new Audio("level-1.vgz");
             backgroundMusic.changeVolumne(0.5D);
@@ -35,6 +46,10 @@ public class Level
     {
         // Do level stuff here
         backgroundMusic.play(1, 10000);
+        for (Spawner s : spawners)
+        {
+            s.activateSpanwer();
+        }
     }
 
     public BufferedImage getImage()
@@ -61,6 +76,11 @@ public class Level
             if (e.y > playerY) e.y -= e.moveY;
             if (e.y < playerY) e.y += e.moveY;
         }
+    }
+
+    public ConcurrentLinkedQueue<Spawner> getSpawners()
+    {
+        return spawners;
     }
 
     public ConcurrentLinkedQueue<Enemy> getEnemies()

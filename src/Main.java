@@ -25,10 +25,19 @@ public class Main
      */
     public Main()
     {
-        gamePad = new JoyPad();
-        this.buildFrame();
-        configFrame.setLocationByPlatform(true);
-        configFrame.setVisible(true);
+        try
+        {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            gamePad = new JoyPad();
+            this.buildFrame();
+            configFrame.setLocationByPlatform(true);
+            configFrame.setVisible(true);
+        }
+        catch (Exception e)
+        {
+            System.out.println("There was an error " + e.getLocalizedMessage());
+            System.exit(0);
+        }
     }
 
     /**
@@ -41,7 +50,7 @@ public class Main
         configFrame.setLayout(new BorderLayout());
         configFrame.setPreferredSize(dimension);
         configFrame.setBounds(0, 0, 320, 240);
-        configFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        configFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         // Start game button
         JButton startButton = new JButton("START GAME");

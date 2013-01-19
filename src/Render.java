@@ -47,15 +47,6 @@ public class Render implements Runnable
         this.shots = new ConcurrentLinkedQueue<Shot>();
         this.currentLevel = new Level();
 
-        try
-        {
-            tmpEnemyImage = ImageIO.read(getClass().getResourceAsStream("assets/baddie.png"));
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
         Dimension dimension = new Dimension(640, 480);
         Frame baseFrame = new Frame("Ace Of Space v0.1");
         baseFrame.setPreferredSize(dimension);
@@ -72,6 +63,7 @@ public class Render implements Runnable
         baseFrame.setResizable(false);
         baseFrame.setBounds(0, 0, 640, 480);
         baseFrame.setLayout(new BorderLayout());
+        baseFrame.setLocationByPlatform(true);
 
         Canvas canvas = new Canvas();
         canvas.setBounds(0, 0, 640, 480);
@@ -90,18 +82,6 @@ public class Render implements Runnable
         GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice graphicsDevice = graphicsEnvironment.getDefaultScreenDevice();
 
-        if (false)
-        {
-            baseFrame.setUndecorated(true);
-            if (graphicsDevice.isFullScreenSupported())
-            {
-                graphicsDevice.setFullScreenWindow(baseFrame);
-            }
-            else
-            {
-                System.out.println("Full screen is not supported on your system :(");
-            }
-        }
         if (graphicsDevice.isDisplayChangeSupported())
         {
             int colorDepth = 32;
@@ -146,14 +126,6 @@ public class Render implements Runnable
         int delta = 98;
         int random = (int) (Math.random() * 100);
 
-        if (random > delta)
-        {
-            Enemy newEnemy = new Enemy();
-            newEnemy.x = 150;
-            newEnemy.y = 300;
-            currentLevel.addEnemy(newEnemy);
-        }
-
         currentLevel.moveEnemies(player.x, player.y);
     }
 
@@ -174,9 +146,14 @@ public class Render implements Runnable
             graphics.fillOval(s.x, s.y, 5,5);
         }
 
+        for (Spawner s : currentLevel.getSpawners())
+        {
+            graphics.drawImage(s.getFrame(),s.x, s.y, null);
+        }
+
         for (Enemy e : currentLevel.getEnemies())
         {
-            graphics.drawImage(tmpEnemyImage, e.x, e.y, null);
+            graphics.drawImage(e.getFrame(), e.x, e.y, null);
         }
 
         graphics.drawImage(player.getFrame(), player.x, player.y, null);
