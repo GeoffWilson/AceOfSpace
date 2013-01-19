@@ -18,6 +18,11 @@ public class Audio
         }
     }
 
+    public void changeVolumne(double volume)
+    {
+        playback.setVolume(volume);
+    }
+
     public void play(int track, int duration)
     {
         Thread t = new Thread(new PlaySound(track, duration));

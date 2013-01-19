@@ -9,6 +9,7 @@ import static java.lang.ClassLoader.getSystemClassLoader;
 public class Level
 {
     private ConcurrentLinkedQueue<Enemy> enemies;
+    private ConcurrentLinkedQueue<Spawner> spanwers;
     private ConcurrentLinkedQueue<Polygon> collisionPoints;
     private BufferedImage texture;
     private Audio backgroundMusic;
@@ -18,9 +19,11 @@ public class Level
         try
         {
             enemies = new ConcurrentLinkedQueue<Enemy>();
+            spanwers = new ConcurrentLinkedQueue<Spawner>();
             collisionPoints = new ConcurrentLinkedQueue<Polygon>();
             texture = ImageIO.read(getSystemClassLoader().getResourceAsStream("levels/test.jpg"));
             backgroundMusic = new Audio("level-1.vgz");
+            backgroundMusic.changeVolumne(0.5D);
         }
         catch (IOException e)
         {

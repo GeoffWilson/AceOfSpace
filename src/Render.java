@@ -143,7 +143,7 @@ public class Render implements Runnable
             }
         }
 
-        int delta = 95;
+        int delta = 98;
         int random = (int) (Math.random() * 100);
 
         if (random > delta)
