@@ -35,7 +35,7 @@ public class Level
         sounds.put("pop", new Audio("pop.vgz"));
         sounds.put("done", new Audio("done.vgz"));
         sounds.get("pop").changeVolumne(2.0D);
-        changeLevel(1, false);
+        changeLevel(1, false, new Point(10 * 32 , 7 * 32));
     }
 
     public Point getStartLocation()
@@ -47,9 +47,15 @@ public class Level
      * Temporary function to allow level switching before a proper structure for levels is created
      * @param id The level number to load
      */
-    public void changeLevel(int id, boolean clear)
+    public void changeLevel(int id, boolean clear, Point startLocation)
     {
         levelID = id;
+        this.startLocation = startLocation;
+
+        if (spawners != null)
+        {
+            for (Spawner s : spawners) s.disableSpanwer();
+        }
 
         enemies = new ConcurrentLinkedQueue<Enemy>();
         spawners = new ConcurrentLinkedQueue<Spawner>();
@@ -61,8 +67,6 @@ public class Level
             switch (id)
             {
                 case 1:
-
-                    startLocation = new Point(10 * 32, 7 * 32);
 
                     collisionPolygon = new Polygon();
                     collisionPolygon.addPoint(64, 64);
@@ -97,12 +101,26 @@ public class Level
                         spawners.add(spawnerTwo);
                         spawners.add(spawnerThree);
                     }
+                    else
+                    {
+                        // Load test entities
+                        StaticEntity downArrow = new StaticEntity(180, 436);
+                        downArrow.loadAnimation("assets/ui/down_arrow_", 2, new int[]{0, 1});
+                        downArrow.changeAnimation("south", 500);
+                        this.addEntity(downArrow);
+
+                        ActivationVector v = new ActivationVector(1, 2);
+                        v.addPoint(4 * 32, 14 * 32);
+                        v.addPoint(9 * 32, 14 * 32);
+                        v.addPoint(9 * 32, 15 * 32);
+                        v.addPoint(4 * 32, 15* 32);
+                        collisionVectors.add(v);
+                    }
 
                     texture = ImageIO.read(getSystemClassLoader().getResourceAsStream("levels/level_1-1.png"));
                     break;
 
                 case 2:
-                    startLocation = new Point(6 * 32, 0);
 
                     collisionPolygon = new Polygon();
                     collisionPolygon.addPoint(0, 9 * 32);
@@ -278,7 +296,6 @@ public class Level
                 {
                     if (levelID == 1)
                     {
-                        // Load test entities
                         StaticEntity downArrow = new StaticEntity(180, 436);
                         downArrow.loadAnimation("assets/ui/down_arrow_", 2, new int[]{0, 1});
                         downArrow.changeAnimation("south", 500);

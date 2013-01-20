@@ -232,7 +232,9 @@ public class Render implements Runnable
                 switch (v.getAction())
                 {
                     case 1: // Level switch
-                        levelManager.changeLevel(v.getActionDataID(), v.getFlag(0));
+                        boolean clear = v.getFlag(0);
+                        int levelID = v.getActionDataID();
+                        levelManager.changeLevel(levelID, clear, levelID == 1 ? new Point(7 * 32, 12 * 32) : new Point (7 * 32, 2 * 32));
                         Point p = levelManager.getStartLocation();
                         player.x = p.x;
                         player.y = p.y;
@@ -246,7 +248,8 @@ public class Render implements Runnable
                         goBack.addPoint(4 * 32, 32);
                         levelManager.addCollisionVector(goBack);
 
-                        levelManager.beginLevel(false);
+                        if (!clear) levelManager.beginLevel(false);
+
                         break;
                 }
             }
