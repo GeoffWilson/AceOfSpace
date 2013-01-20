@@ -26,7 +26,7 @@ public class Render implements Runnable
     private JoyPad gamePad;
     private Player player;
     private ConcurrentLinkedQueue<Shot> shots;
-    private Level currentLevel;
+    private Level levelManager;
     private boolean running = true;
     private boolean gameStarted = false;
 
@@ -53,7 +53,7 @@ public class Render implements Runnable
         this.gamePad = gamePad;
         this.setupGame();
         this.shots = new ConcurrentLinkedQueue<Shot>();
-        this.currentLevel = new Level();
+        this.levelManager = new Level();
 
         try
         {
@@ -104,14 +104,15 @@ public class Render implements Runnable
             int colorDepth = 32;
             graphicsDevice.setDisplayMode(new DisplayMode(640, 480, colorDepth, DisplayMode.REFRESH_RATE_UNKNOWN));
         }
-
-
     }
 
     private void startGame()
     {
         LockSupport.parkNanos(500000000L);
-        currentLevel.beginLevel();
+        levelManager.beginLevel(true);
+        Point p = levelManager.getStartLocation();
+        player.x = p.x;
+        player.y = p.y;
         gameStarted = true;
     }
 
@@ -139,17 +140,17 @@ public class Render implements Runnable
     {
         for (Shot s : shots)
         {
-            if (currentLevel.checkGeometryCollision(s.x, s.y, 8, 8))
+            if (levelManager.checkGeometryCollision(s.x, s.y, 8, 8))
             {
                 shots.remove(s);
             }
-            else if (currentLevel.checkEntityCollision(s.x, s.y))
+            else if (levelManager.checkEntityCollision(s.x, s.y))
             {
                 shots.remove(s);
             }
         }
 
-        currentLevel.moveEnemies(player.x, player.y);
+        levelManager.moveEnemies(player.x, player.y);
     }
 
     private void render()
@@ -159,7 +160,7 @@ public class Render implements Runnable
         if (gameStarted)
         {
             graphics.setColor(Color.BLACK);
-            graphics.drawImage(currentLevel.getImage(), 0, 0, null);
+            graphics.drawImage(levelManager.getImage(), 0, 0, null);
 
             for (Shot s : shots)
             {
@@ -173,17 +174,17 @@ public class Render implements Runnable
                 graphics.drawOval(s.x, s.y, 8, 8);
             }
 
-            for (Spawner s : currentLevel.getSpawners())
+            for (Spawner s : levelManager.getSpawners())
             {
                 graphics.drawImage(s.getFrame(), s.x, s.y, null);
             }
 
-            for (Enemy e : currentLevel.getEnemies())
+            for (Enemy e : levelManager.getEnemies())
             {
                 graphics.drawImage(e.getFrame(), e.x, e.y, null);
             }
 
-            for (StaticEntity s : currentLevel.getEntities())
+            for (StaticEntity s : levelManager.getEntities())
             {
                 graphics.drawImage(s.getFrame(), s.x, s.y, null);
             }
@@ -198,7 +199,7 @@ public class Render implements Runnable
             }
 
             graphics.setColor(Color.WHITE);
-            graphics.drawString(Integer.toString(currentLevel.getEnemyCount()), 10, 20);
+            graphics.drawString(Integer.toString(levelManager.getEnemyCount()), 10, 20);
         }
         else
         {
@@ -219,10 +220,35 @@ public class Render implements Runnable
             UIGameLock = gamePad.getButton(1);
 
             // Work out player details
-            if (!currentLevel.checkGeometryCollision(player.x + (x * player.moveX) + 16, player.y + (y * player.moveY) + 40, 32, 24))
+            if (!levelManager.checkGeometryCollision(player.x + (x * player.moveX) + 16, player.y + (y * player.moveY) + 40, 32, 24))
             {
                 player.x += x * player.moveX;
                 player.y += y * player.moveY;
+            }
+
+            ActivationVector v = levelManager.checkActivationCollision(player.x , player.y, 32, 24);
+            if (v != null)
+            {
+                switch (v.getAction())
+                {
+                    case 1: // Level switch
+                        levelManager.changeLevel(v.getActionDataID(), v.getFlag(0));
+                        Point p = levelManager.getStartLocation();
+                        player.x = p.x;
+                        player.y = p.y;
+                        shots.clear();
+
+                        ActivationVector goBack = new ActivationVector(1, 1);
+                        goBack.setFlag(0, true);
+                        goBack.addPoint(4 * 32, 0);
+                        goBack.addPoint(9 * 32, 0);
+                        goBack.addPoint(9 * 32, 32);
+                        goBack.addPoint(4 * 32, 32);
+                        levelManager.addCollisionVector(goBack);
+
+                        levelManager.beginLevel(false);
+                        break;
+                }
             }
 
             if (x == 0 && y == 1) player.updateDirection(Directions.SOUTH);
