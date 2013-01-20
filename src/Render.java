@@ -1,11 +1,17 @@
 import ui.MessageWindow;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.LockSupport;
+
+import static java.lang.ClassLoader.getSystemClassLoader;
 
 /**
  * Renders the main game to the screen
@@ -22,6 +28,9 @@ public class Render implements Runnable
     private ConcurrentLinkedQueue<Shot> shots;
     private Level currentLevel;
     private boolean running = true;
+    private boolean gameStarted = false;
+
+    private BufferedImage titleScreen;
 
     private boolean UIGameLock = false;
 
@@ -45,6 +54,16 @@ public class Render implements Runnable
         this.setupGame();
         this.shots = new ConcurrentLinkedQueue<Shot>();
         this.currentLevel = new Level();
+
+        try
+        {
+            InputStream in = getSystemClassLoader().getResourceAsStream("assets/ui/temp_title.png");
+            titleScreen = ImageIO.read(in);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
 
         Frame baseFrame = new Frame("Ace Of Space v0.2");
         baseFrame.addWindowListener(new WindowAdapter()
@@ -86,7 +105,14 @@ public class Render implements Runnable
             graphicsDevice.setDisplayMode(new DisplayMode(640, 480, colorDepth, DisplayMode.REFRESH_RATE_UNKNOWN));
         }
 
+
+    }
+
+    private void startGame()
+    {
+        LockSupport.parkNanos(500000000L);
         currentLevel.beginLevel();
+        gameStarted = true;
     }
 
     private void setupGame()
@@ -130,47 +156,54 @@ public class Render implements Runnable
     {
         graphics = (Graphics2D) buffer.getDrawGraphics();
 
-        graphics.setColor(Color.BLACK);
-        graphics.drawImage(currentLevel.getImage(), 0, 0, null);
-
-        for (Shot s : shots)
+        if (gameStarted)
         {
-            if (s.x > 640 || s.x < 0) shots.remove(s);
-            if (s.y > 480 || s.y < 0) shots.remove(s);
+            graphics.setColor(Color.BLACK);
+            graphics.drawImage(currentLevel.getImage(), 0, 0, null);
 
-            s.inc();
-            graphics.setColor(Color.BLUE);
-            graphics.fillOval(s.x, s.y, 7, 7);
+            for (Shot s : shots)
+            {
+                if (s.x > 640 || s.x < 0) shots.remove(s);
+                if (s.y > 480 || s.y < 0) shots.remove(s);
+
+                s.inc();
+                graphics.setColor(Color.BLUE);
+                graphics.fillOval(s.x, s.y, 7, 7);
+                graphics.setColor(Color.WHITE);
+                graphics.drawOval(s.x, s.y, 8, 8);
+            }
+
+            for (Spawner s : currentLevel.getSpawners())
+            {
+                graphics.drawImage(s.getFrame(), s.x, s.y, null);
+            }
+
+            for (Enemy e : currentLevel.getEnemies())
+            {
+                graphics.drawImage(e.getFrame(), e.x, e.y, null);
+            }
+
+            for (StaticEntity s : currentLevel.getEntities())
+            {
+                graphics.drawImage(s.getFrame(), s.x, s.y, null);
+            }
+
+            graphics.drawImage(player.getFrame(), player.x, player.y, null);
+
+            if (UIGameLock)
+            {
+                MessageWindow msgWindow = new MessageWindow(graphics);
+                msgWindow.setText("Hello World");
+                msgWindow.render();
+            }
+
             graphics.setColor(Color.WHITE);
-            graphics.drawOval(s.x, s.y, 8, 8);
+            graphics.drawString(Integer.toString(currentLevel.getEnemyCount()), 10, 20);
         }
-
-        for (Spawner s : currentLevel.getSpawners())
+        else
         {
-            graphics.drawImage(s.getFrame(), s.x, s.y, null);
+            graphics.drawImage(titleScreen, 0, 0, null);
         }
-
-        for (Enemy e : currentLevel.getEnemies())
-        {
-            graphics.drawImage(e.getFrame(), e.x, e.y, null);
-        }
-
-        for (StaticEntity s : currentLevel.getEntities())
-        {
-            graphics.drawImage(s.getFrame(), s.x, s.y, null);
-        }
-
-        graphics.drawImage(player.getFrame(), player.x, player.y, null);
-
-        if (UIGameLock)
-        {
-            MessageWindow msgWindow = new MessageWindow(graphics);
-            msgWindow.setText("Hello World");
-            msgWindow.render();
-        }
-
-        graphics.setColor(Color.WHITE);
-        graphics.drawString(Integer.toString(currentLevel.getEnemyCount()), 10, 20);
 
         buffer.show();
     }
@@ -181,80 +214,87 @@ public class Render implements Runnable
         int y = gamePad.getYAxis();
         boolean shoot = gamePad.getButton(0);
 
-        UIGameLock = gamePad.getButton(1);
-
-        // Work out player details
-        if (!currentLevel.checkGeometryCollision(player.x + (x * player.moveX) + 16, player.y + (y * player.moveY) + 40, 32, 24))
+        if (gameStarted)
         {
-            player.x += x * player.moveX;
-            player.y += y * player.moveY;
-        }
+            UIGameLock = gamePad.getButton(1);
 
-        if (x == 0 && y == 1) player.updateDirection(Directions.SOUTH);
-        else if (x == 1 && y == 1) player.updateDirection(Directions.SOUTH_EAST);
-        else if (x == 1 && y == 0) player.updateDirection(Directions.EAST);
-        else if (x == 1 && y == -1) player.updateDirection(Directions.NORTH_EAST);
-        else if (x == 0 && y == -1) player.updateDirection(Directions.NORTH);
-        else if (x == -1 && y == -1) player.updateDirection(Directions.NORTH_WEST);
-        else if (x == -1 && y == 0) player.updateDirection(Directions.WEST);
-        else if (x == -1 && y == 1) player.updateDirection(Directions.SOUTH_WEST);
-
-        if (shoot && !player.shoot)
-        {
-            player.shoot = true;
-            player.shoot();
-
-            Shot newShot = new Shot();
-            newShot.x = player.x + 26;
-            newShot.y = player.y + 26;
-            int shotIncX = 0;
-            int shotIncY = 0;
-
-            if (x == 0 && y == 0)
+            // Work out player details
+            if (!currentLevel.checkGeometryCollision(player.x + (x * player.moveX) + 16, player.y + (y * player.moveY) + 40, 32, 24))
             {
-                switch (player.direction)
+                player.x += x * player.moveX;
+                player.y += y * player.moveY;
+            }
+
+            if (x == 0 && y == 1) player.updateDirection(Directions.SOUTH);
+            else if (x == 1 && y == 1) player.updateDirection(Directions.SOUTH_EAST);
+            else if (x == 1 && y == 0) player.updateDirection(Directions.EAST);
+            else if (x == 1 && y == -1) player.updateDirection(Directions.NORTH_EAST);
+            else if (x == 0 && y == -1) player.updateDirection(Directions.NORTH);
+            else if (x == -1 && y == -1) player.updateDirection(Directions.NORTH_WEST);
+            else if (x == -1 && y == 0) player.updateDirection(Directions.WEST);
+            else if (x == -1 && y == 1) player.updateDirection(Directions.SOUTH_WEST);
+
+            if (shoot && !player.shoot)
+            {
+                player.shoot = true;
+                player.shoot();
+
+                Shot newShot = new Shot();
+                newShot.x = player.x + 26;
+                newShot.y = player.y + 26;
+                int shotIncX = 0;
+                int shotIncY = 0;
+
+                if (x == 0 && y == 0)
                 {
-                    case NORTH:
-                        shotIncY = -4;
-                        break;
-                    case SOUTH:
-                        shotIncY = 4;
-                        break;
-                    case EAST:
-                        shotIncX = 4;
-                        break;
-                    case WEST:
-                        shotIncX = -4;
-                        break;
-                    case NORTH_EAST:
-                        shotIncX = 4;
-                        shotIncY = -4;
-                        break;
-                    case NORTH_WEST:
-                        shotIncX = -4;
-                        shotIncY = -4;
-                        break;
-                    case SOUTH_EAST:
-                        shotIncX = 4;
-                        shotIncY = 4;
-                        break;
-                    case SOUTH_WEST:
-                        shotIncX = -4;
-                        shotIncY = 4;
-                        break;
+                    switch (player.direction)
+                    {
+                        case NORTH:
+                            shotIncY = -4;
+                            break;
+                        case SOUTH:
+                            shotIncY = 4;
+                            break;
+                        case EAST:
+                            shotIncX = 4;
+                            break;
+                        case WEST:
+                            shotIncX = -4;
+                            break;
+                        case NORTH_EAST:
+                            shotIncX = 4;
+                            shotIncY = -4;
+                            break;
+                        case NORTH_WEST:
+                            shotIncX = -4;
+                            shotIncY = -4;
+                            break;
+                        case SOUTH_EAST:
+                            shotIncX = 4;
+                            shotIncY = 4;
+                            break;
+                        case SOUTH_WEST:
+                            shotIncX = -4;
+                            shotIncY = 4;
+                            break;
+                    }
                 }
-            }
-            else
-            {
-                shotIncX = x == 0 ? 0 : x > 0 ? 4 : -4;
-                shotIncY = y == 0 ? 0 : y > 0 ? 4 : -4;
-            }
+                else
+                {
+                    shotIncX = x == 0 ? 0 : x > 0 ? 4 : -4;
+                    shotIncY = y == 0 ? 0 : y > 0 ? 4 : -4;
+                }
 
-            newShot.xInc = shotIncX;
-            newShot.yInc = shotIncY;
+                newShot.xInc = shotIncX;
+                newShot.yInc = shotIncY;
 
-            shots.add(newShot);
+                shots.add(newShot);
+            }
+            else if (!shoot && player.shoot) player.shoot = false;
         }
-        else if (!shoot && player.shoot) player.shoot = false;
+        else
+        {
+            if (shoot) this.startGame();
+        }
     }
 }

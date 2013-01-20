@@ -3,6 +3,8 @@ import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -63,7 +65,7 @@ public class Level
             spawners.add(spawnerTwo);
             spawners.add(spawnerThree);
 
-            texture = ImageIO.read(getSystemClassLoader().getResourceAsStream("levels/level-1-1.png"));
+            texture = ImageIO.read(getSystemClassLoader().getResourceAsStream("levels/level_1-1.png"));
             sounds.put("music", new Audio("level-1.vgz"));
             sounds.put("pop", new Audio("pop.vgz"));
             sounds.put("done", new Audio("done.vgz"));
@@ -145,6 +147,8 @@ public class Level
 
         for (Enemy e : enemies)
         {
+            if (!e.alive) continue;
+
             Rectangle p = new Rectangle(e.x, e.y, 64, 64);
             if (p.contains(r))
             {
@@ -154,7 +158,13 @@ public class Level
 
         if (hitEnemy != null)
         {
-            enemies.remove(hitEnemy);
+            Timer timer = new Timer();
+            timer.schedule(new RemoveEnemyTask(hitEnemy), 1000);
+            hitEnemy.changeAnimation("die", 100);
+            hitEnemy.moveX = 0;
+            hitEnemy.moveY = 0;
+            hitEnemy.alive = false;
+            //enemies.remove(hitEnemy);
             return true;
         }
 
@@ -182,15 +192,31 @@ public class Level
                     // Load test entities
                     StaticEntity downArrow = new StaticEntity(180, 436);
                     downArrow.loadAnimation("assets/ui/down_arrow_", 2, new int[]{0, 1});
-                    downArrow.changeAnimation("south");
+                    downArrow.changeAnimation("south", 500);
                     this.addEntity(downArrow);
-                    sounds.get("done").play(1, 3);
+                    sounds.get("done").play(1, 2);
                 }
             }
             return true;
         }
 
         return false;
+    }
+
+    private class RemoveEnemyTask extends TimerTask
+    {
+        private Enemy enemy;
+
+        public RemoveEnemyTask(Enemy enemy)
+        {
+            this.enemy = enemy;
+        }
+
+        public void run()
+        {
+            enemies.remove(enemy);
+        }
+
     }
 }
 

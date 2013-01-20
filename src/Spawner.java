@@ -64,7 +64,7 @@ public class Spawner
     public void spawnEnemy()
     {
         Enemy e = new Enemy();
-        e.changeAnimation("south");
+        e.changeAnimation("south", 150);
         e.x = x;
         e.y = y;
         owner.addEnemy(e);

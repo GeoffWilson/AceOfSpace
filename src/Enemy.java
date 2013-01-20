@@ -2,6 +2,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Enemy extends Player
 {
+    public boolean alive = true;
+
     public Enemy()
     {
         super.animations = new ConcurrentHashMap<String, Animation>();
@@ -15,5 +17,9 @@ public class Enemy extends Player
         south.loadAnimation("assets/enemy_one/model_down_", 1);
         south.beginAnimation(1500);
         super.animations.put("south", south);
+
+        Animation die = new Animation(new int[] {0,1,2,3,4,5,6,7,8,9,10});
+        die.loadAnimation("assets/effects/explode/die_", 11);
+        super.animations.put("die", die);
     }
 }

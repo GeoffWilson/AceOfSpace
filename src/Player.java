@@ -45,14 +45,14 @@ public class Player
         animations.get(currentAnimation).beginAnimation(150);
     }
 
-    public void changeAnimation(String name)
+    public void changeAnimation(String name, int delay)
     {
         if (name.contains("north")) name = "north";
         else if (!animations.containsKey(name)) name = "south";
 
         animations.get(currentAnimation).stopAnimation();
         currentAnimation = name;
-        animations.get(name).beginAnimation(150);
+        animations.get(name).beginAnimation(delay);
     }
 
     public BufferedImage getFrame()
@@ -65,7 +65,7 @@ public class Player
         if (this.direction != direction)
         {
             this.direction = direction;
-            changeAnimation(direction.name().toLowerCase());
+            changeAnimation(direction.name().toLowerCase(), 150);
         }
     }
 
