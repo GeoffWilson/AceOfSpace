@@ -3,8 +3,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Player
 {
-    public int x = 100;
-    public int y = 100;
+    public int x = 320;
+    public int y = 256;
     public int moveX = 2;
     public int moveY = 2;
     public boolean shoot;

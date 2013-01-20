@@ -1,12 +1,9 @@
 import ui.MessageWindow;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.LockSupport;
 
@@ -22,7 +19,6 @@ public class Render implements Runnable
     private ConcurrentLinkedQueue<Shot> shots;
     private Level currentLevel;
     private boolean running = true;
-    private BufferedImage tmpEnemyImage;
 
     private boolean UIGameLock = false;
 
@@ -47,9 +43,7 @@ public class Render implements Runnable
         this.shots = new ConcurrentLinkedQueue<Shot>();
         this.currentLevel = new Level();
 
-        Dimension dimension = new Dimension(640, 480);
-        Frame baseFrame = new Frame("Ace Of Space v0.1");
-        baseFrame.setPreferredSize(dimension);
+        Frame baseFrame = new Frame("Ace Of Space v0.2");
         baseFrame.addWindowListener(new WindowAdapter()
         {
             @Override
@@ -61,7 +55,8 @@ public class Render implements Runnable
         });
         baseFrame.setIgnoreRepaint(true);
         baseFrame.setResizable(false);
-        baseFrame.setBounds(0, 0, 640, 480);
+        //baseFrame.setPreferredSize(dimension);
+        //baseFrame.setBounds(0, 0, 640, 480);
         baseFrame.setLayout(new BorderLayout());
         baseFrame.setLocationByPlatform(true);
 
@@ -94,8 +89,6 @@ public class Render implements Runnable
     private void setupGame()
     {
         player = new Player();
-        player.x = 100;
-        player.y = 100;
     }
 
     public void run()
@@ -117,14 +110,15 @@ public class Render implements Runnable
     {
         for (Shot s : shots)
         {
-            if (currentLevel.checkCollision(s.x, s.y))
+            if (currentLevel.checkGeometryCollision(s.x, s.y, 8, 8))
+            {
+                shots.remove(s);
+            }
+            else if (currentLevel.checkEntityCollision(s.x, s.y))
             {
                 shots.remove(s);
             }
         }
-
-        int delta = 98;
-        int random = (int) (Math.random() * 100);
 
         currentLevel.moveEnemies(player.x, player.y);
     }
@@ -142,8 +136,10 @@ public class Render implements Runnable
             if (s.y > 480 || s.y < 0) shots.remove(s);
 
             s.inc();
-            graphics.setColor(Color.YELLOW);
-            graphics.fillOval(s.x, s.y, 5,5);
+            graphics.setColor(Color.BLUE);
+            graphics.fillOval(s.x, s.y, 7, 7);
+            graphics.setColor(Color.WHITE);
+            graphics.drawOval(s.x, s.y, 8, 8);
         }
 
         for (Spawner s : currentLevel.getSpawners())
@@ -180,8 +176,11 @@ public class Render implements Runnable
         UIGameLock = gamePad.getButton(1);
 
         // Work out player details
-        player.x += x * player.moveX;
-        player.y += y * player.moveY;
+        if (!currentLevel.checkGeometryCollision(player.x + (x * player.moveX) + 16, player.y + (y * player.moveY) + 40, 32, 24))
+        {
+            player.x += x * player.moveX;
+            player.y += y * player.moveY;
+        }
 
         if (x == 0 && y == 1) player.updateDirection(Directions.SOUTH);
         else if (x == 1 && y == 1) player.updateDirection(Directions.SOUTH_EAST);
@@ -198,8 +197,8 @@ public class Render implements Runnable
             player.shoot();
 
             Shot newShot = new Shot();
-            newShot.x = player.x + 14;
-            newShot.y = player.y + 14;
+            newShot.x = player.x + 26;
+            newShot.y = player.y + 26;
             int shotIncX = 0;
             int shotIncY = 0;
 

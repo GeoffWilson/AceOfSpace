@@ -67,7 +67,8 @@ public class Animation
 
         public void run()
         {
-            if (++currentFrame == frameOrder.length) currentFrame = 0;
+            if ((currentFrame + 1) == frameOrder.length) currentFrame = 0;
+            else ++currentFrame;
         }
     }
 }

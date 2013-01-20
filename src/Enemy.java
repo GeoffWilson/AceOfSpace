@@ -12,8 +12,8 @@ public class Enemy extends Player
         super.moveY = 1;
 
         Animation south = new Animation(new int[] {0});
-        south.loadAnimation("assets/baddie_", 1);
-        south.beginAnimation(150);
+        south.loadAnimation("assets/enemy_one/model_down_", 1);
+        south.beginAnimation(1500);
         super.animations.put("south", south);
     }
 }

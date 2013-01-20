@@ -20,6 +20,9 @@ public class Spawner
     public int x;
     public int y;
 
+    // Health of the spawner
+    public int health = 10;
+
     // Spawner animations
     private Animation animation;
 
@@ -47,7 +50,6 @@ public class Spawner
     {
         return animation.getFrame();
     }
-
 
     public void activateSpanwer()
     {
