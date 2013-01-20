@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static java.lang.ClassLoader.*;
+import static java.lang.ClassLoader.getSystemClassLoader;
 
 public class Animation
 {
@@ -45,9 +45,17 @@ public class Animation
         {
             for (int i = 0; i < frameCount; i++)
             {
-                InputStream in = getSystemClassLoader().getResourceAsStream(frameName + i + ".png");
-                BufferedImage frame = ImageIO.read(in);
-                frames.add(frame);
+                if (Render.cache.hasSprite(frameName + i))
+                {
+                    frames.add(Render.cache.getSprite(frameName + i));
+                }
+                else
+                {
+                    InputStream in = getSystemClassLoader().getResourceAsStream(frameName + i + ".png");
+                    BufferedImage frame = ImageIO.read(in);
+                    frames.add(frame);
+                    Render.cache.putSprite(frame, frameName + i);
+                }
             }
         }
         catch (Exception ex)
@@ -60,11 +68,6 @@ public class Animation
 
     private class Animate extends TimerTask
     {
-        public Animate()
-        {
-
-        }
-
         public void run()
         {
             if ((currentFrame + 1) == frameOrder.length) currentFrame = 0;

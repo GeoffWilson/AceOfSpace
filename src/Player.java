@@ -72,6 +72,6 @@ public class Player
     public void shoot()
     {
         this.shoot = true;
-        sounds.get("shoot").play(1,2);
+        sounds.get("shoot").play(1, 2);
     }
 }

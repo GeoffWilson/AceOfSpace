@@ -12,6 +12,9 @@ import java.util.concurrent.locks.LockSupport;
  */
 public class Render implements Runnable
 {
+    // Sprite Cache
+    public static SpriteCache cache = new SpriteCache();
+
     private Graphics2D graphics;
     private BufferStrategy buffer;
     private JoyPad gamePad;
@@ -125,7 +128,7 @@ public class Render implements Runnable
 
     private void render()
     {
-        graphics = (Graphics2D)buffer.getDrawGraphics();
+        graphics = (Graphics2D) buffer.getDrawGraphics();
 
         graphics.setColor(Color.BLACK);
         graphics.drawImage(currentLevel.getImage(), 0, 0, null);
@@ -144,12 +147,17 @@ public class Render implements Runnable
 
         for (Spawner s : currentLevel.getSpawners())
         {
-            graphics.drawImage(s.getFrame(),s.x, s.y, null);
+            graphics.drawImage(s.getFrame(), s.x, s.y, null);
         }
 
         for (Enemy e : currentLevel.getEnemies())
         {
             graphics.drawImage(e.getFrame(), e.x, e.y, null);
+        }
+
+        for (StaticEntity s : currentLevel.getEntities())
+        {
+            graphics.drawImage(s.getFrame(), s.x, s.y, null);
         }
 
         graphics.drawImage(player.getFrame(), player.x, player.y, null);

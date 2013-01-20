@@ -13,6 +13,7 @@ public class Main
 
     /**
      * Game entry point
+     *
      * @param args Console arguments (not used)
      */
     public static void main(String[] args)
@@ -27,6 +28,7 @@ public class Main
     {
         try
         {
+            // Use the system look and feel for dialog windows
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             gamePad = new JoyPad();
             this.buildFrame();
@@ -54,10 +56,12 @@ public class Main
 
         // Start game button
         JButton startButton = new JButton("START GAME");
-        startButton.addActionListener(new ActionListener() {
+        startButton.addActionListener(new ActionListener()
+        {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                gamePad.setController((Controller)controllerJComboBox.getSelectedItem());
+            public void actionPerformed(ActionEvent e)
+            {
+                gamePad.setController((Controller) controllerJComboBox.getSelectedItem());
                 configFrame.dispose();
                 startGame();
             }
@@ -68,6 +72,7 @@ public class Main
         controllerJComboBox = new JComboBox<Controller>();
         if (gamePad.getAvailableControllers().size() == 0)
         {
+            // If there is no valid controllers then prevent the game from starting (keyboard support to come)
             JLabel label = new JLabel("No controllers detected, unable to start");
             configFrame.add(label, BorderLayout.NORTH);
             startButton.setEnabled(false);

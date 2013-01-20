@@ -9,7 +9,6 @@ import java.util.TimerTask;
  *
  * @author Geoff Wilson
  * @version 1.0
- *
  */
 public class Spawner
 {
@@ -21,7 +20,7 @@ public class Spawner
     public int y;
 
     // Health of the spawner
-    public int health = 10;
+    public int health = 5;
 
     // Spawner animations
     private Animation animation;
@@ -35,7 +34,7 @@ public class Spawner
         this.owner = owner;
         this.type = type;
         this.spawnRate = spawnRate;
-        this.animation = new Animation(new int[] {0});
+        this.animation = new Animation(new int[]{0});
         animation.loadAnimation("assets/spawner/spawner_", 1);
         animation.beginAnimation(25000);
     }

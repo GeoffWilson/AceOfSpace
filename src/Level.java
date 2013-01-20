@@ -8,10 +8,17 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static java.lang.ClassLoader.getSystemClassLoader;
 
+/**
+ * Manages a level
+ *
+ * @author Geoff Wilson
+ * @version 1.0
+ */
 public class Level
 {
     private ConcurrentLinkedQueue<Enemy> enemies;
     private ConcurrentLinkedQueue<Spawner> spawners;
+    private ConcurrentLinkedQueue<StaticEntity> entities;
     private BufferedImage texture;
     private ConcurrentHashMap<String, Audio> sounds;
     public Polygon collisionPolygon;
@@ -21,7 +28,7 @@ public class Level
         try
         {
             collisionPolygon = new Polygon();
-            collisionPolygon.addPoint(64,64);
+            collisionPolygon.addPoint(64, 64);
             collisionPolygon.addPoint(512, 64);
             collisionPolygon.addPoint(512, 96);
             collisionPolygon.addPoint(576, 96);
@@ -42,6 +49,7 @@ public class Level
             enemies = new ConcurrentLinkedQueue<Enemy>();
             spawners = new ConcurrentLinkedQueue<Spawner>();
             sounds = new ConcurrentHashMap<String, Audio>();
+            entities = new ConcurrentLinkedQueue<StaticEntity>();
 
             // Create three test spawners
             Spawner spawnerOne = new Spawner(this, 0, 2500);
@@ -58,12 +66,18 @@ public class Level
             texture = ImageIO.read(getSystemClassLoader().getResourceAsStream("levels/level-1-1.png"));
             sounds.put("music", new Audio("level-1.vgz"));
             sounds.put("pop", new Audio("pop.vgz"));
+            sounds.put("done", new Audio("done.vgz"));
             sounds.get("pop").changeVolumne(2.0D);
         }
         catch (IOException e)
         {
             e.printStackTrace();
         }
+    }
+
+    public void addEntity(StaticEntity entity)
+    {
+        entities.add(entity);
     }
 
     public void beginLevel()
@@ -113,6 +127,11 @@ public class Level
         return enemies;
     }
 
+    public ConcurrentLinkedQueue<StaticEntity> getEntities()
+    {
+        return entities;
+    }
+
     public boolean checkGeometryCollision(int x, int y, int w, int h)
     {
         Area area = new Area(collisionPolygon);
@@ -126,7 +145,7 @@ public class Level
 
         for (Enemy e : enemies)
         {
-            Rectangle p = new Rectangle(e.x, e.y, 64 ,64);
+            Rectangle p = new Rectangle(e.x, e.y, 64, 64);
             if (p.contains(r))
             {
                 hitEnemy = e;
@@ -143,7 +162,7 @@ public class Level
 
         for (Spawner s : spawners)
         {
-            Rectangle p = new Rectangle(s.x, s.y, 32 ,32);
+            Rectangle p = new Rectangle(s.x, s.y, 32, 32);
             if (p.contains(r))
             {
                 hitSpawner = s;
@@ -155,8 +174,18 @@ public class Level
             if (--hitSpawner.health == 0)
             {
                 hitSpawner.disableSpanwer();
-                sounds.get("pop").play(1,2);
+                sounds.get("pop").play(1, 2);
                 spawners.remove(hitSpawner);
+
+                if (spawners.size() == 0)
+                {
+                    // Load test entities
+                    StaticEntity downArrow = new StaticEntity(180, 436);
+                    downArrow.loadAnimation("assets/ui/down_arrow_", 2, new int[]{0, 1});
+                    downArrow.changeAnimation("south");
+                    this.addEntity(downArrow);
+                    sounds.get("done").play(1, 3);
+                }
             }
             return true;
         }

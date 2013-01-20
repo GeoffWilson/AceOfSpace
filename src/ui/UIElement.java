@@ -1,7 +1,8 @@
 package ui;
 
 
-public interface UIElement {
+public interface UIElement
+{
 
     void render();
 }
