@@ -18,28 +18,53 @@ public class JoyPad
     private ArrayList<Controller> availableControllers;
 
     private Controller controller;
+
+    // For gamepads
     private Component[] buttons;
     private Component xAxis;
     private Component yAxis;
 
+    // For Keyboards
+    private Component[] actionKeys;
+    private Component upKey;
+    private Component downKey;
+    private Component leftKey;
+    private Component rightKey;
+
+    private boolean keyboard;
+
     public JoyPad()
     {
+        keyboard = false;
         availableControllers = getValidControllers();
     }
 
     public boolean getButton(int button)
     {
+        if (keyboard) return actionKeys[button].getPollData() > 0.9F;
         return buttons[button].getPollData() > 0.9F;
     }
 
     public int getXAxis()
     {
-        return Math.round(xAxis.getPollData());
+        if (!keyboard)
+        {
+            return Math.round(xAxis.getPollData());
+        }
+        int left = -Math.round(leftKey.getPollData());
+        int right = Math.round(rightKey.getPollData());
+        return left + right;
     }
 
     public int getYAxis()
     {
-        return Math.round(yAxis.getPollData());
+        if (!keyboard)
+        {
+            return Math.round(xAxis.getPollData());
+        }
+        int up = -Math.round(upKey.getPollData());
+        int down = Math.round(downKey.getPollData());
+        return up + down;
     }
 
     private class GamePadPoll extends TimerTask
@@ -54,13 +79,29 @@ public class JoyPad
     {
         controller = c;
 
-        xAxis = controller.getComponent(Component.Identifier.Axis.X);
-        yAxis = controller.getComponent(Component.Identifier.Axis.Y);
-        buttons = new Component[8];
+        if (c.getType() == Controller.Type.KEYBOARD)
+        {
+            keyboard = true;
 
-        buttons[0] = controller.getComponent(Component.Identifier.Button._0);
-        buttons[1] = controller.getComponent(Component.Identifier.Button._1);
-        buttons[2] = controller.getComponent(Component.Identifier.Button._2);
+            upKey = controller.getComponent(Component.Identifier.Key.W);
+            downKey = controller.getComponent(Component.Identifier.Key.S);
+            leftKey = controller.getComponent(Component.Identifier.Key.A);
+            rightKey = controller.getComponent(Component.Identifier.Key.D);
+
+            actionKeys = new Component[2];
+            actionKeys[0] = controller.getComponent(Component.Identifier.Key.SPACE);
+            actionKeys[1] = controller.getComponent(Component.Identifier.Key.RETURN);
+        }
+        else
+        {
+            xAxis = controller.getComponent(Component.Identifier.Axis.X);
+            yAxis = controller.getComponent(Component.Identifier.Axis.Y);
+
+            buttons = new Component[8];
+            buttons[0] = controller.getComponent(Component.Identifier.Button._0);
+            buttons[1] = controller.getComponent(Component.Identifier.Button._1);
+            buttons[2] = controller.getComponent(Component.Identifier.Button._2);
+        }
 
         GamePadPoll poll = new GamePadPoll();
         Timer timer = new Timer();
@@ -79,7 +120,7 @@ public class JoyPad
 
         for (Controller c : controllerEnvironment.getControllers())
         {
-            if (c.getType() == Controller.Type.GAMEPAD || c.getType() == Controller.Type.STICK)
+            if (c.getType() == Controller.Type.GAMEPAD || c.getType() == Controller.Type.STICK || c.getType() == Controller.Type.KEYBOARD)
             {
                 controllers.add(c);
             }

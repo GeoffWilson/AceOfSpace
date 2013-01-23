@@ -77,8 +77,6 @@ public class Render implements Runnable
         });
         baseFrame.setIgnoreRepaint(true);
         baseFrame.setResizable(false);
-        //baseFrame.setPreferredSize(dimension);
-        //baseFrame.setBounds(0, 0, 640, 480);
         baseFrame.setLayout(new BorderLayout());
         baseFrame.setLocationByPlatform(true);
 
