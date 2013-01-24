@@ -8,8 +8,13 @@ public class Audio
     {
         try
         {
+            // We want the sound to be slightly crunched because of poor sample rate
             playback = new VGMPlayer(22050);
+
+            // Default volume is 1.0
             playback.setVolume(1.0D);
+
+            //TODO: This should be loaded as a resource from the JAR, this will crash outside of IDE
             playback.loadFile("src/audio/" + fileName);
         }
         catch (Exception e)

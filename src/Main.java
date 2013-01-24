@@ -1,6 +1,7 @@
 import net.java.games.input.Controller;
 
 import javax.swing.*;
+import javax.swing.plaf.ComboBoxUI;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -56,6 +57,7 @@ public class Main
 
         // Start game button
         JButton startButton = new JButton("START GAME");
+        startButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
         startButton.addActionListener(new ActionListener()
         {
             @Override
@@ -70,6 +72,7 @@ public class Main
 
         // Controller selection
         controllerJComboBox = new JComboBox<Controller>();
+        controllerJComboBox.setFont(new Font("Segoe UI", Font.BOLD, 14));
         if (gamePad.getAvailableControllers().size() == 0)
         {
             // If there is no valid controllers then prevent the game from starting (keyboard support to come)

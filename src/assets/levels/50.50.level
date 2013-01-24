@@ -1,0 +1,69 @@
+<level>
+    <basic>
+        <location x="50" y="50" z="1"/>
+        <name>Before the frost</name>
+        <music>/assets/audio/music/track.1.vgz</music>
+    </basic>
+    <polygon>
+        <point x="2" y="2"/>
+        <point x="16" y="2"/>
+        <point x="16" y="3"/>
+        <point x="18" y="3"/>
+        <point x="18" y="5"/>
+        <point x="19" y="5"/>
+        <point x="19" y="7"/>
+        <point x="18" y="7"/>
+        <point x="18" y="9"/>
+        <point x="17" y="9"/>
+        <point x="17" y="13"/>
+        <point x="9" y="13"/>
+        <point x="9" y="15"/>
+        <point x="4" y="15"/>
+        <point x="4" y="12"/>
+        <point x="2" y="12"/>
+    </polygon>
+    <entities>
+        <!-- TYPE 0 = MOB SPAWNER -->
+        <entity type="0">
+            <location x="128" y="128"/>
+            <source>/assets/entities/spawner.entity</source>
+            <data delay="0" rate="2500" health="5"/>
+        </entity>
+        <entity type="0">
+            <location x="512" y="192"/>
+            <source>/assets/entities/spawner.entity</source>
+            <data delay="0" rate="2500" health="5"/>
+        </entity>
+        <entity type="0">
+            <location x="320" y="384"/>
+            <source>/assets/entities/spawner.entity</source>
+            <data delay="0" rate="2500" health="5"/>
+        </entity>
+    </entities>
+    <actions>
+        <!-- TYPE 0 = CHANGE LEVEL -->
+        <!-- TRIGGER 0 = ENABLE WHEN LEVEL CLEAR -->
+        <action type="0" trigger="0">
+            <!-- TYPE 1 = STATIC ANIMATION (NO DATA)-->
+            <entity type="1">
+                <location x="180" y="436"/>
+                <source>/assets/entities/downArrow.entity</source>
+            </entity>
+            <vector>
+                <polygon>
+                    <point x="4" y="14"/>
+                    <point x="9" y="14"/>
+                    <point x="9" y="15"/>
+                    <point x="4" y="15"/>
+                </polygon>
+                <triggers>
+                    <north>false</north>
+                    <east>false</east>
+                    <south>true</south>
+                    <west>false</west>
+                </triggers>
+                <destination x="50" y="49" z="1"/>
+            </vector>
+        </action>
+    </actions>
+</level>
