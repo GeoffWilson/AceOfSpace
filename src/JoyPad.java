@@ -3,8 +3,6 @@ import net.java.games.input.Controller;
 import net.java.games.input.ControllerEnvironment;
 
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Manages input from a controller.

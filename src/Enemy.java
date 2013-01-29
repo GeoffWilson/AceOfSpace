@@ -18,7 +18,7 @@ public class Enemy extends Player
         south.beginAnimation(1500);
         super.animations.put("south", south);
 
-        Animation die = new Animation(new int[] {0,1,2,3,4,5,6,7,8,9,10});
+        Animation die = new Animation(new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
         die.loadAnimation("assets/effects/explode/die_", 11);
         super.animations.put("die", die);
     }

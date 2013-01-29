@@ -20,7 +20,7 @@ public class ActivationVector
         this.actionDataFlags = new boolean[10];
 
         // Set all flags to false
-        for (int i = 0; i < 10; i ++) actionDataFlags[i] = false;
+        for (int i = 0; i < 10; i++) actionDataFlags[i] = false;
 
         this.actionDataID = actionDataID;
         this.action = action;

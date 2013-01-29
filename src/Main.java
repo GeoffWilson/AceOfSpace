@@ -1,7 +1,6 @@
 import net.java.games.input.Controller;
 
 import javax.swing.*;
-import javax.swing.plaf.ComboBoxUI;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -95,7 +94,7 @@ public class Main
      */
     public void startGame()
     {
-        Thread thread = new Thread(new Render(gamePad), "Core Rendering");
+        Thread thread = new Thread(new Control(gamePad), "Game Control Thread");
         thread.start();
     }
 }

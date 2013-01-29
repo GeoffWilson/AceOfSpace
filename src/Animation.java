@@ -45,16 +45,16 @@ public class Animation
         {
             for (int i = 0; i < frameCount; i++)
             {
-                if (Render.cache.hasSprite(frameName + i))
+                if (Control.cache.hasSprite(frameName + i))
                 {
-                    frames.add(Render.cache.getSprite(frameName + i));
+                    frames.add(Control.cache.getSprite(frameName + i));
                 }
                 else
                 {
                     InputStream in = getSystemClassLoader().getResourceAsStream(frameName + i + ".png");
                     BufferedImage frame = ImageIO.read(in);
                     frames.add(frame);
-                    Render.cache.putSprite(frame, frameName + i);
+                    Control.cache.putSprite(frame, frameName + i);
                 }
             }
         }

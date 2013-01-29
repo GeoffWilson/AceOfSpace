@@ -1,20 +1,14 @@
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 import java.io.InputStream;
-import java.util.jar.Attributes;
 
 import static java.lang.ClassLoader.getSystemClassLoader;
 
@@ -63,7 +57,7 @@ public class LevelParser extends DefaultHandler
 
             return true;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             e.printStackTrace();
         }

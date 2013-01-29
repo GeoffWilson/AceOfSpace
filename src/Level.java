@@ -1,14 +1,7 @@
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import static java.lang.ClassLoader.getSystemClassLoader;
 
 /**
  * Manages a level
@@ -16,7 +9,7 @@ import static java.lang.ClassLoader.getSystemClassLoader;
  * @author Geoff Wilson
  * @version 1.0
  */
-public class Level
+public class Level implements Renderable
 {
     // Basic Data
     private String name;
@@ -36,6 +29,59 @@ public class Level
     private ConcurrentLinkedQueue<Spawner> spawners;
     private ConcurrentLinkedQueue<StaticEntity> entities;
     private ConcurrentLinkedQueue<ActivationVector> collisionVectors;
+    private ConcurrentLinkedQueue<Shot> shots;
+
+    // Control object
+    private Control control;
+
+    public Level(Control control)
+    {
+        this.control = control;
+    }
+
+    /**
+     * Interface implementation, each level is capable of rendering itself.
+     *
+     * @param graphics The graphics object to render to (provided by Control)
+     */
+    public void render(Graphics2D graphics)
+    {
+        graphics.setColor(Color.BLACK);
+        graphics.drawImage(texture, 0, 0, null);
+
+        for (Shot s : shots)
+        {
+            if (s.x > 640 || s.x < 0) shots.remove(s);
+            if (s.y > 480 || s.y < 0) shots.remove(s);
+
+            s.inc();
+            graphics.setColor(Color.BLUE);
+            graphics.fillOval(s.x, s.y, 7, 7);
+            graphics.setColor(Color.WHITE);
+            graphics.drawOval(s.x, s.y, 8, 8);
+        }
+
+        for (Spawner s : spawners)
+        {
+            graphics.drawImage(s.getFrame(), s.x, s.y, null);
+        }
+
+        for (Enemy e : enemies)
+        {
+            graphics.drawImage(e.getFrame(), e.x, e.y, null);
+        }
+
+        for (StaticEntity s : entities)
+        {
+            graphics.drawImage(s.getFrame(), s.x, s.y, null);
+        }
+
+        Player p = control.getPlayer();
+        graphics.drawImage(p.getFrame(), p.x, p.y, null);
+
+        graphics.setColor(Color.WHITE);
+        graphics.drawString(Integer.toString(enemies.size()), 10, 20);
+    }
 
     public void setLocation(int x, int y, int z)
     {
@@ -71,7 +117,7 @@ public class Level
 
     public void beginLevel(boolean startMusic)
     {
-        if (startMusic) sounds.get("music").play(1, 10000);
+        if (startMusic) control.sounds.get("music").play(1, 10000);
         for (Spawner s : spawners)
         {
             s.activateSpanwer();
@@ -169,7 +215,7 @@ public class Level
             if (--hitSpawner.health == 0)
             {
                 hitSpawner.disableSpanwer();
-                sounds.get("pop").play(1, 2);
+                control.sounds.get("pop").play(1, 2);
                 spawners.remove(hitSpawner);
             }
 
@@ -177,6 +223,21 @@ public class Level
         }
 
         return false;
+    }
+
+    public void addShot(Shot s)
+    {
+        shots.add(s);
+    }
+
+    public ConcurrentLinkedQueue<Shot> getShots()
+    {
+        return this.shots;
+    }
+
+    public void removeShot(Shot s)
+    {
+        shots.remove(s);
     }
 }
 
