@@ -16,10 +16,6 @@ public class Player
     public Player()
     {
         animations = new ConcurrentHashMap<String, Animation>();
-        sounds = new ConcurrentHashMap<String, Audio>();
-
-        Audio shootSound = new Audio("shot.vgz");
-        sounds.put("shoot", shootSound);
 
         direction = Directions.SOUTH;
 
@@ -72,6 +68,5 @@ public class Player
     public void shoot()
     {
         this.shoot = true;
-        sounds.get("shoot").play(1, 2);
     }
 }

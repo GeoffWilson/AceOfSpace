@@ -24,7 +24,7 @@ public class Control implements Runnable
     private JoyPad gamePad;
 
     // Levels, this needs testing to see how many we can load into memory at once!
-    private ConcurrentHashMap<Integer, Level> levels;
+    private ConcurrentHashMap<String, Level> levels;
     private Level currentLevel;
 
     // Player data
@@ -41,14 +41,21 @@ public class Control implements Runnable
     {
         // Ensure all objects are initialized
         this.gamePad = gamePad;
-        levels = new ConcurrentHashMap<Integer, Level>();
+        levels = new ConcurrentHashMap<String, Level>();
         player = new Player();
         sounds = new ConcurrentHashMap<String, Audio>();
         renderQueue = new ConcurrentLinkedQueue<Renderable>();
 
         // Load the music
         sounds.put("music", new Audio("level-1.vgz"));
+        sounds.put("pop", new Audio("pop.vgz"));
+        sounds.put("shot", new Audio("shot.vgz"));
         sounds.get("music").play(1, 10000);
+
+        // Load the levels :D
+        LevelParser levelParser = new LevelParser();
+        Level level = levelParser.readLevelData("50.50.1", this);
+        if (level != null) levels.put("50.50.1", level);
 
         // Create the frame
         configureFrame();
@@ -174,7 +181,7 @@ public class Control implements Runnable
                         boolean clear = v.getFlag(0);
                         int levelID = v.getActionDataID();
 
-                        changeLevel("50.50");
+                        changeLevel("50.50.1");
 
                         ActivationVector goBack = new ActivationVector(1, 1);
                         goBack.setFlag(0, true);
@@ -201,6 +208,8 @@ public class Control implements Runnable
 
             if (shoot && !player.shoot)
             {
+                sounds.get("shot").play(1, 1);
+
                 player.shoot = true;
                 player.shoot();
 
@@ -262,8 +271,12 @@ public class Control implements Runnable
             if (shoot)
             {
                 renderQueue.remove();
+                currentLevel = levels.get("50.50.1");
+                currentLevel.beginLevel(false);
+                renderQueue.add(currentLevel);
                 started = true;
             }
         }
     }
 }
+/* “People always leave traces. No person is without a shadow.” */

@@ -16,6 +16,11 @@ public class StaticEntity extends Player
         super.direction = Directions.SOUTH;
     }
 
+    public StaticEntity()
+    {
+        //To change body of created methods use File | Settings | File Templates.
+    }
+
     public void loadAnimation(String name, int frameCount, int[] frameOrder)
     {
         Animation a = new Animation(frameOrder);

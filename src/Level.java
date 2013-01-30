@@ -37,6 +37,11 @@ public class Level implements Renderable
     public Level(Control control)
     {
         this.control = control;
+        this.enemies = new ConcurrentLinkedQueue<Enemy>();
+        this.spawners = new ConcurrentLinkedQueue<Spawner>();
+        this.entities = new ConcurrentLinkedQueue<StaticEntity>();
+        this.collisionVectors = new ConcurrentLinkedQueue<ActivationVector>();
+        this.shots = new ConcurrentLinkedQueue<Shot>();
     }
 
     /**
@@ -79,8 +84,9 @@ public class Level implements Renderable
         Player p = control.getPlayer();
         graphics.drawImage(p.getFrame(), p.x, p.y, null);
 
-        graphics.setColor(Color.WHITE);
-        graphics.drawString(Integer.toString(enemies.size()), 10, 20);
+        // Draws the collision polygon (for debugging)
+        graphics.setColor(Color.RED);
+        graphics.draw(collisionPolygon);
     }
 
     public void setLocation(int x, int y, int z)
@@ -124,6 +130,11 @@ public class Level implements Renderable
         }
     }
 
+    public void setTexture(BufferedImage texture)
+    {
+        this.texture = texture;
+    }
+
     public BufferedImage getImage()
     {
         return texture;
@@ -137,6 +148,11 @@ public class Level implements Renderable
     public int getEnemyCount()
     {
         return enemies.size();
+    }
+
+    public void addSpanwer(Spawner s)
+    {
+        this.spawners.add(s);
     }
 
     public ConcurrentLinkedQueue<Spawner> getSpawners()
